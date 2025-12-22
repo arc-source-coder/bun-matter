@@ -2,6 +2,10 @@
   "name": "bun-matter",
   "module": "src/index.ts",
   "type": "module",
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "typecheck": "bun --bun tsgo && bun --bun oxlint"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "@typescript/native-preview": "^7.0.0-dev.20251221.1",
