@@ -4,14 +4,16 @@
   "type": "module",
   "scripts": {
     "dev": "bun run src/index.ts",
+    "format": "bun --bun oxfmt",
     "typecheck": "bun --bun tsgo && bun --bun oxlint"
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "@typescript/native-preview": "^7.0.0-dev.20251221.1",
-    "oxlint": "^1.34.0"
+    "@typescript/native-preview": "^7.0.0-dev.20251222.1",
+    "oxfmt": "^0.20.0",
+    "oxlint": "^1.35.0"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   }
 }

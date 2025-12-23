@@ -23,12 +23,9 @@ describe.skip(".excerpt (TODO: Fix excerpt contract)", () => {
   });
 
   it("should use a custom separator", () => {
-    const file = matter(
-      "---\nabc: xyz\n---\nfoo\nbar\nbaz\n<!-- endexcerpt -->\ncontent",
-      {
-        excerpt_separator: "<!-- endexcerpt -->",
-      },
-    );
+    const file = matter("---\nabc: xyz\n---\nfoo\nbar\nbaz\n<!-- endexcerpt -->\ncontent", {
+      excerpt_separator: "<!-- endexcerpt -->",
+    });
 
     expect(file.matter).toBe("\nabc: xyz");
     expect(file.content).toBe("foo\nbar\nbaz\n<!-- endexcerpt -->\ncontent");

@@ -16,17 +16,13 @@ describe(".stringify", () => {
   it("should use custom delimiters to stringify", () => {
     const data = { name: "gray-matter" };
     const actual = matter.stringify("Name: {{name}}", data, { delims: "~~~" });
-    expect(actual).toBe(
-      ["~~~", "name: gray-matter", "~~~", "Name: {{name}}\n"].join("\n"),
-    );
+    expect(actual).toBe(["~~~", "name: gray-matter", "~~~", "Name: {{name}}\n"].join("\n"));
   });
 
   it("should stringify a file object", () => {
     const file = { content: "Name: {{name}}", data: { name: "gray-matter" } };
     const actual = matter.stringify(file);
-    expect(actual).toBe(
-      ["---", "name: gray-matter", "---", "Name: {{name}}\n"].join("\n"),
-    );
+    expect(actual).toBe(["---", "name: gray-matter", "---", "Name: {{name}}\n"].join("\n"));
   });
 
   it("should stringify an excerpt", () => {
@@ -36,14 +32,9 @@ describe(".stringify", () => {
       excerpt: "This is an excerpt.",
     };
     expect(matter.stringify(file)).toBe(
-      [
-        "---",
-        "name: gray-matter",
-        "---",
-        "This is an excerpt.",
-        "---",
-        "Name: {{name}}\n",
-      ].join("\n"),
+      ["---", "name: gray-matter", "---", "This is an excerpt.", "---", "Name: {{name}}\n"].join(
+        "\n",
+      ),
     );
   });
 
@@ -55,12 +46,7 @@ describe(".stringify", () => {
     };
 
     expect(matter.stringify(file)).toBe(
-      [
-        "---",
-        "name: gray-matter",
-        "---",
-        "Name: {{name}}\n\nThis is an excerpt.\n",
-      ].join("\n"),
+      ["---", "name: gray-matter", "---", "Name: {{name}}\n\nThis is an excerpt.\n"].join("\n"),
     );
   });
 });

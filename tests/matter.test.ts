@@ -50,9 +50,7 @@ describe("gray-matter", () => {
       '---\nabc: xyz\nversion: 2\n---\n\n<span class="alert alert-info">This is an alert</span>\n';
     const actual = matter(fixture);
     expect(actual.data).toEqual({ abc: "xyz", version: 2 });
-    expect(actual.content).toBe(
-      '\n<span class="alert alert-info">This is an alert</span>\n',
-    );
+    expect(actual.content).toBe('\n<span class="alert alert-info">This is an alert</span>\n');
     expect(actual.orig.toString()).toBe(fixture);
   });
 
@@ -61,9 +59,7 @@ describe("gray-matter", () => {
       '~~~\nabc: xyz\nversion: 2\n~~~\n\n<span class="alert alert-info">This is an alert</span>\n';
     const actual = matter(fixture, { delims: "~~~" });
     expect(actual.data).toEqual({ abc: "xyz", version: 2 });
-    expect(actual.content).toBe(
-      '\n<span class="alert alert-info">This is an alert</span>\n',
-    );
+    expect(actual.content).toBe('\n<span class="alert alert-info">This is an alert</span>\n');
     expect(actual.orig.toString()).toBe(fixture);
   });
 
@@ -72,15 +68,12 @@ describe("gray-matter", () => {
       '~~~\nabc: xyz\nversion: 2\n~~~\n\n<span class="alert alert-info">This is an alert</span>\n';
     const actual = matter(fixture, { delims: ["~~~"] });
     expect(actual.data).toEqual({ abc: "xyz", version: 2 });
-    expect(actual.content).toBe(
-      '\n<span class="alert alert-info">This is an alert</span>\n',
-    );
+    expect(actual.content).toBe('\n<span class="alert alert-info">This is an alert</span>\n');
     expect(actual.orig.toString()).toBe(fixture);
   });
 
   it("should correctly identify delimiters and ignore strings that look like delimiters.", () => {
-    const fixture =
-      '---\nname: "troublesome --- value"\n---\nhere is some content\n';
+    const fixture = '---\nname: "troublesome --- value"\n---\nhere is some content\n';
     const actual = matter(fixture);
     expect(actual.data).toEqual({ name: "troublesome --- value" });
     expect(actual.content).toBe("here is some content\n");

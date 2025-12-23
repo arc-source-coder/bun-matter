@@ -49,9 +49,7 @@ describe("parse YAML:", () => {
       '---\nabc: xyz\nversion: 2\n---\n\n<span class="alert alert-info">This is an alert</span>\n';
     const actual = matter(fixture, { safeLoad: true });
     expect(actual.data).toEqual({ abc: "xyz", version: 2 });
-    expect(actual.content).toBe(
-      '\n<span class="alert alert-info">This is an alert</span>\n',
-    );
+    expect(actual.content).toBe('\n<span class="alert alert-info">This is an alert</span>\n');
     expect(actual.hasOwnProperty("orig")).toBeTruthy();
   });
 });

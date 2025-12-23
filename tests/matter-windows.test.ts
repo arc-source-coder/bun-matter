@@ -36,9 +36,7 @@ describe("gray-matter (windows carriage returns)", () => {
       '---\r\nabc: xyz\r\nversion: 2\r\n---\r\n\r\n<span class="alert alert-info">This is an alert</span>\r\n';
     const actual = matter(fixture);
     expect(actual.data).toEqual({ abc: "xyz", version: 2 });
-    expect(actual.content).toBe(
-      '\r\n<span class="alert alert-info">This is an alert</span>\r\n',
-    );
+    expect(actual.content).toBe('\r\n<span class="alert alert-info">This is an alert</span>\r\n');
     expect(actual.orig.toString()).toBe(fixture);
   });
 
@@ -47,9 +45,7 @@ describe("gray-matter (windows carriage returns)", () => {
       '~~~\r\nabc: xyz\r\nversion: 2\r\n~~~\r\n\r\n<span class="alert alert-info">This is an alert</span>\r\n';
     const actual = matter(fixture, { delims: "~~~" });
     expect(actual.data).toEqual({ abc: "xyz", version: 2 });
-    expect(actual.content).toBe(
-      '\r\n<span class="alert alert-info">This is an alert</span>\r\n',
-    );
+    expect(actual.content).toBe('\r\n<span class="alert alert-info">This is an alert</span>\r\n');
     expect(actual.orig.toString()).toBe(fixture);
   });
 
@@ -58,15 +54,12 @@ describe("gray-matter (windows carriage returns)", () => {
       '~~~\r\nabc: xyz\r\nversion: 2\r\n~~~\r\n\r\n<span class="alert alert-info">This is an alert</span>\r\n';
     const actual = matter(fixture, { delims: ["~~~"] });
     expect(actual.data).toEqual({ abc: "xyz", version: 2 });
-    expect(actual.content).toBe(
-      '\r\n<span class="alert alert-info">This is an alert</span>\r\n',
-    );
+    expect(actual.content).toBe('\r\n<span class="alert alert-info">This is an alert</span>\r\n');
     expect(actual.orig.toString()).toBe(fixture);
   });
 
   it("should correctly identify delimiters and ignore strings that look like delimiters.", () => {
-    const fixture =
-      '---\r\nname: "troublesome --- value"\r\n---\r\nhere is some content\r\n';
+    const fixture = '---\r\nname: "troublesome --- value"\r\n---\r\nhere is some content\r\n';
     const actual = matter(fixture);
     expect(actual.data).toEqual({ name: "troublesome --- value" });
     expect(actual.content).toBe("here is some content\r\n");
@@ -80,9 +73,7 @@ describe("gray-matter (windows carriage returns)", () => {
     const actual = matter(fixture);
     expect(actual.data).toEqual({ name: "troublesome --- value" });
     expect(actual.content).toBe("");
-    expect(String(actual.orig)).toBe(
-      '---\r\nname: "troublesome --- value"\r\n',
-    );
+    expect(String(actual.orig)).toBe('---\r\nname: "troublesome --- value"\r\n');
   });
 
   it("should not try to parse a string has content that looks like front-matter.", () => {
@@ -90,8 +81,6 @@ describe("gray-matter (windows carriage returns)", () => {
     const actual = matter(fixture);
     expect(actual.data).toEqual({});
     expect(actual.content).toBe("-----------name--------------value\r\nfoo");
-    expect(String(actual.orig)).toBe(
-      "-----------name--------------value\r\nfoo",
-    );
+    expect(String(actual.orig)).toBe("-----------name--------------value\r\nfoo");
   });
 });
