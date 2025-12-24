@@ -41,16 +41,16 @@ describe("gray-matter (windows carriage returns)", () => {
   it("should use a custom delimiter as a string.", () => {
     const fixture =
       '~~~\r\nabc: xyz\r\nversion: 2\r\n~~~\r\n\r\n<span class="alert alert-info">This is an alert</span>\r\n';
-    const actual = matter(fixture, { delims: "~~~" });
+    const actual = matter(fixture, { delimiters: ["~~~", "~~~"] });
     expect(actual.data).toEqual({ abc: "xyz", version: 2 });
     expect(actual.content).toBe('\r\n<span class="alert alert-info">This is an alert</span>\r\n');
     expect(actual.orig.toString()).toBe(fixture);
   });
 
-  it("should use custom delimiters as an array.", () => {
+  it("should use custom opening and closing delimiters.", () => {
     const fixture =
-      '~~~\r\nabc: xyz\r\nversion: 2\r\n~~~\r\n\r\n<span class="alert alert-info">This is an alert</span>\r\n';
-    const actual = matter(fixture, { delims: ["~~~"] });
+      '---\r\nabc: xyz\r\nversion: 2\r\n~~~\r\n\r\n<span class="alert alert-info">This is an alert</span>\r\n';
+    const actual = matter(fixture, { delimiters: ["---", "~~~"] });
     expect(actual.data).toEqual({ abc: "xyz", version: 2 });
     expect(actual.content).toBe('\r\n<span class="alert alert-info">This is an alert</span>\r\n');
     expect(actual.orig.toString()).toBe(fixture);

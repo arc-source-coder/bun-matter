@@ -53,19 +53,19 @@ describe("gray-matter", () => {
     expect(actual.orig.toString()).toBe(fixture);
   });
 
-  it("should use a custom delimiter as a string.", () => {
+  it("should use custom delimiters as an array.", () => {
     const fixture =
       '~~~\nabc: xyz\nversion: 2\n~~~\n\n<span class="alert alert-info">This is an alert</span>\n';
-    const actual = matter(fixture, { delims: "~~~" });
+    const actual = matter(fixture, { delimiters: ["~~~", "~~~"] });
     expect(actual.data).toEqual({ abc: "xyz", version: 2 });
     expect(actual.content).toBe('\n<span class="alert alert-info">This is an alert</span>\n');
     expect(actual.orig.toString()).toBe(fixture);
   });
 
-  it("should use custom delimiters as an array.", () => {
+  it("should use custom opening and closing delimiters.", () => {
     const fixture =
-      '~~~\nabc: xyz\nversion: 2\n~~~\n\n<span class="alert alert-info">This is an alert</span>\n';
-    const actual = matter(fixture, { delims: ["~~~"] });
+      '~~~\nabc: xyz\nversion: 2\n---\n\n<span class="alert alert-info">This is an alert</span>\n';
+    const actual = matter(fixture, { delimiters: ["~~~", "---"] });
     expect(actual.data).toEqual({ abc: "xyz", version: 2 });
     expect(actual.content).toBe('\n<span class="alert alert-info">This is an alert</span>\n');
     expect(actual.orig.toString()).toBe(fixture);
