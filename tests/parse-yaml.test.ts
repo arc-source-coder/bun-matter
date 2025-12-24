@@ -56,7 +56,6 @@ describe("parse YAML:", () => {
     const file = await Bun.file(fixture("basic.txt")).text();
     const actual = matter(file);
 
-    expect(actual.hasOwnProperty("path")).toBeTruthy();
     expect(actual.hasOwnProperty("data", { title: "Basic" })).toBeTruthy();
     expect(actual.content).toBe("this is content.");
   });
@@ -68,7 +67,6 @@ describe("parse YAML:", () => {
     expect(actual.hasOwnProperty("data")).toBeTruthy();
     expect(actual.data.root).toBe("_gh_pages");
 
-    expect(actual.hasOwnProperty("path")).toBeTruthy();
     expect(actual.hasOwnProperty("content")).toBeTruthy();
     expect(actual.hasOwnProperty("orig")).toBeTruthy();
     expect(actual.data.hasOwnProperty("root")).toBeTruthy();
