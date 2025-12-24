@@ -1,6 +1,4 @@
 import { describe, it, expect } from "bun:test";
-
-import utils from "../lib/utils";
 import matter from "../src/index";
 
 describe("gray-matter", () => {
@@ -18,8 +16,8 @@ describe("gray-matter", () => {
     expect(file3.data).toEqual({});
   });
 
-  it("should add content with empty front matter to file.empty", () => {
-    expect(matter("---\n---").empty).toEqual("---\n---");
+  it("should keep content even if front matter is empty", () => {
+    expect(matter("---\n---").content).toEqual("---\n---");
   });
 
   it("should update file.isEmpty to true", () => {
@@ -28,6 +26,6 @@ describe("gray-matter", () => {
 
   it("should work when front-matter has comments", () => {
     const fixture = "---\n # this is a comment\n# another one\n---";
-    expect(matter(fixture).empty).toEqual(fixture);
+    expect(matter(fixture).content).toEqual(fixture);
   });
 });

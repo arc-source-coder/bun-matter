@@ -3,30 +3,30 @@ import matter from "../src/index";
 
 describe(".language", () => {
   it("should detect the name of the language to parse", () => {
-    expect(matter.language("---\nfoo: bar\n---")).toEqual({
+    expect(matter("---\nfoo: bar\n---").language).toEqual({
       raw: "",
       name: "",
     });
-    expect(matter.language("---toml\nfoo: bar\n---")).toEqual({
+    expect(matter("---toml\nfoo: bar\n---").language).toEqual({
       raw: "toml",
       name: "TOML",
     });
-    expect(matter.language("---json\nfoo: bar\n---")).toEqual({
+    expect(matter("---json\nfoo: bar\n---").language).toEqual({
       raw: "json",
       name: "JSON",
     });
   });
 
   it("should work around whitespace", () => {
-    expect(matter.language("--- \nfoo: bar\n---")).toEqual({
+    expect(matter("--- \nfoo: bar\n---").language).toEqual({
       raw: " ",
       name: "",
     });
-    expect(matter.language("--- toml \nfoo: bar\n---")).toEqual({
+    expect(matter("--- toml \nfoo: bar\n---").language).toEqual({
       raw: " toml ",
       name: "TOML",
     });
-    expect(matter.language("---  json \nfoo: bar\n---")).toEqual({
+    expect(matter("---  json \nfoo: bar\n---").language).toEqual({
       raw: "  json ",
       name: "JSON",
     });

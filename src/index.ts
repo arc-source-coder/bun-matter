@@ -2,49 +2,38 @@ import parse from "./parse";
 import stringify from "./stringify";
 import type { Engine } from "./parse";
 import { DEFAULT_OPTIONS } from "./defaults";
-import { isObjectLiteralElementLike } from "typescript";
 
 export type MatterInput = string | { content: string };
 
 export interface Language {
   raw: string;
-  name: string | undefined;
+  name: string;
 }
 
 export interface ParsedMatter {
-  data: Object;
+  data: any;
   content: string;
   matter: string;
-  original: string;
+  language: Language;
   isEmpty: boolean;
 }
 
 export interface MatterOptions {
   language?: string;
-  delimiters?: [string, string?];
+  delimiters?: string | [string, string?];
 }
 
 export default function matter(input: MatterInput, opts?: MatterOptions): ParsedMatter {
-  if (input === "") return { data: {}, content: input, excerpt: "", orig: input };
+  if (input === "") return { data: {}, content: input, matter: "", language: "", isEmpty: true };
 
-  const original = typeof input === "string" ? input : input.content;
+  input = typeof input === "string" ? input : input.content;
   const options: Required<MatterOptions> = { ...DEFAULT_OPTIONS, ...opts };
-  return parseMatter(original, options);
+  return parseMatter(input, options);
 }
 
 matter.stringify = (object: unknown): string => {
   // This is a stub
   return stringify(object);
-};
-
-matter.language = (input: string, options: MatterOptions): Language => {
-  let opener = "---";
-  if (options !== undefined) {
-    if (options.delimiters !== undefined) {
-      opener = options.delimiters[0];
-    }
-  }
-  return detectLanguage(input, opener);
 };
 
 function detectLanguage(input: string, opener: string): Language {
@@ -68,8 +57,7 @@ function detectLanguage(input: string, opener: string): Language {
   };
 }
 
-function parseMatter(original: string, options: Required<MatterOptions>): ParsedMatter {
-  let input = original;
+function parseMatter(input: string, options: Required<MatterOptions>): ParsedMatter {
   const opener = options.delimiters[0];
   const closer = "\n" + options.delimiters[1];
 
@@ -80,14 +68,26 @@ function parseMatter(original: string, options: Required<MatterOptions>): Parsed
   let isEmpty = false;
 
   if (input.slice(0, openerLength) !== opener) {
-    return { data: {}, content: original, original: original, matter: "", isEmpty: false };
+    return {
+      data: {},
+      content: input,
+      matter: "",
+      language: { raw: "", name: "" },
+      isEmpty: false,
+    };
   }
 
   // if the next character after the opening delimiter is
   // a character from the delimiter, then it's not a front-matter delimiter
   if (input.charAt(openerLength) === opener.slice(-1)) {
     // TODO: fix
-    return { data: {}, content: original, original: original, matter: "", isEmpty: false };
+    return {
+      data: {},
+      content: input,
+      matter: "",
+      language: { raw: "", name: "" },
+      isEmpty: false,
+    };
   }
 
   // strip the opening delimiter
@@ -113,7 +113,7 @@ function parseMatter(original: string, options: Required<MatterOptions>): Parsed
     isEmpty = true;
   } else {
     // create data (frontmatter) by parsing the raw matter block
-    data = parse(language, matter) as Object;
+    data = parse(language, matter) as any;
   }
 
   // update content
@@ -130,8 +130,8 @@ function parseMatter(original: string, options: Required<MatterOptions>): Parsed
   return {
     data: data,
     content: content,
-    original: original,
-    matter: block
+    matter: block,
+    language: language,
     isEmpty: isEmpty,
   };
 }

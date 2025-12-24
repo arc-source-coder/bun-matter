@@ -31,7 +31,6 @@ describe("parse YAML:", () => {
     expect(actual.data.title).toBe("YAML");
     expect(actual.hasOwnProperty("data")).toBeTruthy();
     expect(actual.hasOwnProperty("content")).toBeTruthy();
-    expect(actual.hasOwnProperty("orig")).toBeTruthy();
   });
 
   it("should detect YAML as the language with no language defined after the first fence", async () => {
@@ -40,7 +39,6 @@ describe("parse YAML:", () => {
     expect(actual.data.title).toBe("autodetect-no-lang");
     expect(actual.hasOwnProperty("data")).toBeTruthy();
     expect(actual.hasOwnProperty("content")).toBeTruthy();
-    expect(actual.hasOwnProperty("orig")).toBeTruthy();
   });
 
   it("should detect YAML as the language", async () => {
@@ -49,7 +47,6 @@ describe("parse YAML:", () => {
     expect(actual.data.title).toBe("autodetect-yaml");
     expect(actual.hasOwnProperty("data")).toBeTruthy();
     expect(actual.hasOwnProperty("content")).toBeTruthy();
-    expect(actual.hasOwnProperty("orig")).toBeTruthy();
   });
 
   it("should extract YAML front matter from files with content.", async () => {
@@ -68,7 +65,32 @@ describe("parse YAML:", () => {
     expect(actual.data.root).toBe("_gh_pages");
 
     expect(actual.hasOwnProperty("content")).toBeTruthy();
-    expect(actual.hasOwnProperty("orig")).toBeTruthy();
     expect(actual.data.hasOwnProperty("root")).toBeTruthy();
+  });
+
+  it("should return an object when a file is empty", async () => {
+    const file = await Bun.file(fixture("empty.md")).text();
+    const actual = matter(file);
+    expect(actual.hasOwnProperty("data")).toBeTruthy();
+    expect(actual.hasOwnProperty("content")).toBeTruthy();
+  });
+
+  it("should return an object when no front matter exists", async () => {
+    const file = await Bun.file(fixture("hasnt-matter.md")).text();
+    const actual = matter(file);
+    expect(actual.hasOwnProperty("data")).toBeTruthy();
+    expect(actual.hasOwnProperty("content")).toBeTruthy();
+  });
+
+  it("should parse YAML files directly", async () => {
+    const file = await Bun.file(fixture("all.yaml")).text();
+    const actual = matter(file);
+    expect(actual.hasOwnProperty("data")).toBeTruthy();
+    expect(actual.hasOwnProperty("content")).toBeTruthy();
+    expect(actual.data).toEqual({
+      one: "foo",
+      two: "bar",
+      three: "baz",
+    });
   });
 });
