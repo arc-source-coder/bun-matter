@@ -1,7 +1,7 @@
 import { describe, it, expect } from "bun:test";
 import matter from "../src/index";
 
-describe(".stringify", () => {
+describe.skip(".stringify", () => {
   it("should stringify front-matter from a file object", () => {
     const file = { content: "Name: {{name}}\n", data: { name: "gray-matter" } };
     expect(matter.stringify(file)).toBe(

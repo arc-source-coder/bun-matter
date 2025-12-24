@@ -2,8 +2,9 @@ import { describe, it, expect } from "bun:test";
 import matter from "../src/index";
 
 describe("parse json:", () => {
-  it("should parse JSON front matter.", () => {
-    const actual = matter.read("./test/fixtures/lang-json.md", {
+  it("should parse JSON front matter.", async () => {
+    const file = await Bun.file("./tests/fixtures/lang-json.md").text();
+    const actual = matter(file, {
       lang: "json",
     });
 
@@ -13,8 +14,9 @@ describe("parse json:", () => {
     expect(actual.hasOwnProperty("orig")).toBeTruthy();
   });
 
-  it("should auto-detect JSON as the language.", () => {
-    const actual = matter.read("./test/fixtures/autodetect-json.md");
+  it("should auto-detect JSON as the language.", async () => {
+    const file = await Bun.file("./tests/fixtures/autodetect-json.md").text();
+    const actual = matter(file);
 
     expect(actual.data.title).toBe("autodetect-JSON");
     expect(actual.hasOwnProperty("data")).toBeTruthy();

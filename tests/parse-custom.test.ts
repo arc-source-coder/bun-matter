@@ -2,8 +2,9 @@ import { describe, it, expect } from "bun:test";
 import matter from "../src/index";
 
 describe("custom parser:", function () {
-  it("should allow a custom parser to be registered:", () => {
-    const actual = matter.read("./test/fixtures/lang-yaml.md", {
+  it("should allow a custom parser to be registered:", async () => {
+    const file = await Bun.file("./tests/fixtures/lang-yaml.md").text();
+    const actual = matter(file, {
       parser: function customParser(str: string, opts) {
         try {
           // TODO: Add opts

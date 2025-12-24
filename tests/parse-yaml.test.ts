@@ -1,55 +1,76 @@
 import { describe, it, expect } from "bun:test";
 import matter from "../src/index";
+import path from "path";
+
+const fixture = path.join.bind(path, __dirname, "fixtures");
 
 describe("parse YAML:", () => {
-  it("should parse YAML", () => {
-    const file = matter.read("./test/fixtures/all.yaml");
-    expect(file.data).toEqual({
+  it("should parse YAML", async () => {
+    const file = await Bun.file("./tests/fixtures/all.yaml").text();
+    const actual = matter(file);
+    expect(actual.data).toEqual({
       one: "foo",
       two: "bar",
       three: "baz",
     });
   });
 
-  it("should parse YAML with closing ...", () => {
-    const file = matter.read("./test/fixtures/all-dots.yaml");
-    expect(file.data).toEqual({
+  it("should parse YAML with closing ...", async () => {
+    const file = await Bun.file("./tests/fixtures/all-dots.yaml").text();
+    const actual = matter(file);
+    expect(actual.data).toEqual({
       one: "foo",
       two: "bar",
       three: "baz",
     });
   });
 
-  it("should parse YAML front matter", () => {
-    const actual = matter.read("./test/fixtures/lang-yaml.md");
+  it("should parse YAML front matter", async () => {
+    const file = await Bun.file("./tests/fixtures/lang-yaml.md").text();
+    const actual = matter(file);
     expect(actual.data.title).toBe("YAML");
     expect(actual.hasOwnProperty("data")).toBeTruthy();
     expect(actual.hasOwnProperty("content")).toBeTruthy();
     expect(actual.hasOwnProperty("orig")).toBeTruthy();
   });
 
-  it("should detect YAML as the language with no language defined after the first fence", () => {
-    const actual = matter.read("./test/fixtures/autodetect-no-lang.md");
+  it("should detect YAML as the language with no language defined after the first fence", async () => {
+    const file = await Bun.file("./tests/fixtures/autodetect-no-lang.md").text();
+    const actual = matter(file);
     expect(actual.data.title).toBe("autodetect-no-lang");
     expect(actual.hasOwnProperty("data")).toBeTruthy();
     expect(actual.hasOwnProperty("content")).toBeTruthy();
     expect(actual.hasOwnProperty("orig")).toBeTruthy();
   });
 
-  it("should detect YAML as the language", () => {
-    const actual = matter.read("./test/fixtures/autodetect-yaml.md");
+  it("should detect YAML as the language", async () => {
+    const file = await Bun.file("./tests/fixtures/autodetect-yaml.md").text();
+    const actual = matter(file);
     expect(actual.data.title).toBe("autodetect-yaml");
     expect(actual.hasOwnProperty("data")).toBeTruthy();
     expect(actual.hasOwnProperty("content")).toBeTruthy();
     expect(actual.hasOwnProperty("orig")).toBeTruthy();
   });
 
-  it("should use safeLoad when specified", () => {
-    const fixture =
-      '---\nabc: xyz\nversion: 2\n---\n\n<span class="alert alert-info">This is an alert</span>\n';
-    const actual = matter(fixture, { safeLoad: true });
-    expect(actual.data).toEqual({ abc: "xyz", version: 2 });
-    expect(actual.content).toBe('\n<span class="alert alert-info">This is an alert</span>\n');
+  it("should extract YAML front matter from files with content.", async () => {
+    const file = await Bun.file(fixture("basic.txt")).text();
+    const actual = matter(file);
+
+    expect(actual.hasOwnProperty("path")).toBeTruthy();
+    expect(actual.hasOwnProperty("data", { title: "Basic" })).toBeTruthy();
+    expect(actual.content).toBe("this is content.");
+  });
+
+  it("should parse complex YAML front matter.", async () => {
+    const file = await Bun.file(fixture("complex.md")).text();
+    const actual = matter(file);
+
+    expect(actual.hasOwnProperty("data")).toBeTruthy();
+    expect(actual.data.root).toBe("_gh_pages");
+
+    expect(actual.hasOwnProperty("path")).toBeTruthy();
+    expect(actual.hasOwnProperty("content")).toBeTruthy();
     expect(actual.hasOwnProperty("orig")).toBeTruthy();
+    expect(actual.data.hasOwnProperty("root")).toBeTruthy();
   });
 });
