@@ -14,21 +14,14 @@ export interface Language {
 export interface ParsedMatter {
   data: Object;
   content: string;
-  orig: string;
-  excerpt?: string;
-  language?: Language;
-  matter?: string;
-  path?: string;
-  isEmpty?: boolean;
-  empty?: string;
+  matter: string;
+  original: string;
+  isEmpty: boolean;
 }
 
 export interface MatterOptions {
-  excerpt?: boolean | Function;
-  excerpt_separator?: string;
-  engines?: { engine: Function } | { engine: Engine };
-  delimiters?: [string, string?];
   language?: string;
+  delimiters?: [string, string?];
 }
 
 export default function matter(input: MatterInput, opts?: MatterOptions): ParsedMatter {
@@ -82,20 +75,19 @@ function parseMatter(original: string, options: Required<MatterOptions>): Parsed
 
   const openerLength = opener.length;
 
-  let isEmpty = false;
-  let empty = "";
   let data = {};
   let content = "";
+  let isEmpty = false;
 
   if (input.slice(0, openerLength) !== opener) {
-    return { data: {}, content: original, excerpt: original, orig: original };
+    return { data: {}, content: original, original: original, matter: "", isEmpty: false };
   }
 
   // if the next character after the opening delimiter is
   // a character from the delimiter, then it's not a front-matter delimiter
   if (input.charAt(openerLength) === opener.slice(-1)) {
     // TODO: fix
-    return { data: {}, content: original, excerpt: original, orig: original };
+    return { data: {}, content: original, original: original, matter: "", isEmpty: false };
   }
 
   // strip the opening delimiter
@@ -119,7 +111,6 @@ function parseMatter(original: string, options: Required<MatterOptions>): Parsed
   const block = matter.replace(/^\s*#[^\n]+/gm, "").trim();
   if (block === "") {
     isEmpty = true;
-    empty = original;
   } else {
     // create data (frontmatter) by parsing the raw matter block
     data = parse(language, matter) as Object;
@@ -136,14 +127,11 @@ function parseMatter(original: string, options: Required<MatterOptions>): Parsed
     }
   }
 
-  // TODO: implement excerpt handling
-
   return {
     data: data,
     content: content,
-    excerpt: "",
-    orig: original,
+    original: original,
+    matter: block
     isEmpty: isEmpty,
-    empty: empty,
   };
 }
