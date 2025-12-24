@@ -6,5 +6,16 @@ export interface Engine {
 }
 
 export default function parse(language: Language, matter: string): unknown {
-  return Bun.YAML.parse(matter);
+  switch (language.name) {
+    case "TOML":
+      return Bun.TOML.parse(matter);
+    case "JSON":
+      return JSON.parse(matter);
+    default:
+      const parsed = Bun.YAML.parse(matter);
+      if (typeof parsed !== "object" || parsed === null) {
+        return {};
+      }
+      return parsed;
+  }
 }

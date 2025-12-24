@@ -105,12 +105,14 @@ function parseMatter(original: string, options: Required<MatterOptions>): Parsed
   // TODO: detect language
   const language = detectLanguage(input, opener);
 
+  // strip language from the input
+  input = input.slice(language.raw.length);
+
   // get the index of the closing delimiter
   let closerIndex = input.indexOf(closer);
   if (closerIndex === -1) {
     closerIndex = length;
   }
-
   // get the raw front-matter block
   let matter = input.slice(0, closerIndex);
 
