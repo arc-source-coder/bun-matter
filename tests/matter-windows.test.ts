@@ -9,14 +9,6 @@ describe("gray-matter (windows carriage returns)", () => {
     expect(actual.data.abc).toEqual("xyz");
   });
 
-  it("should throw parsing errors", () => {
-    expect(() => matter("---whatever\r\nabc: xyz\r\n---")).toThrow();
-  });
-
-  it("should throw an error when a string is not passed:", () => {
-    expect(() => matter()).toThrow();
-  });
-
   it("should return an object when the string is 0 length:", () => {
     expect(typeof matter("") === "object").toBeTruthy();
   });

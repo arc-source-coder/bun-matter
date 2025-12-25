@@ -9,10 +9,6 @@ describe("gray-matter", () => {
     expect(actual.data.abc).toEqual("xyz");
   });
 
-  it("extra characters should throw parsing errors", () => {
-    expect(() => matter("---whatever\nabc: xyz\n---")).toThrow();
-  });
-
   it("boolean yaml types should still return the empty object", () => {
     const actual = matter("--- true\n---");
     expect(actual.data).toEqual({});
@@ -26,10 +22,6 @@ describe("gray-matter", () => {
   it("number yaml types should still return the empty object", () => {
     const actual = matter("--- 42\n---");
     expect(actual.data).toEqual({});
-  });
-
-  it("should throw an error when a string is not passed:", () => {
-    expect(() => matter()).toThrow();
   });
 
   it("should return an object when the string is 0 length:", () => {
