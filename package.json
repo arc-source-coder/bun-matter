@@ -1,5 +1,6 @@
 {
   "name": "bun-matter",
+  "version": "0.1.0",
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
@@ -9,7 +10,7 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "@typescript/native-preview": "^7.0.0-dev.20251222.1",
+    "@typescript/native-preview": "^7.0.0-dev.20251226.1",
     "oxfmt": "^0.20.0",
     "oxlint": "^1.35.0"
   },

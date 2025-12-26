@@ -53,7 +53,7 @@ describe("parse YAML:", () => {
     const file = await Bun.file(fixture("basic.txt")).text();
     const actual = matter(file);
 
-    expect(actual.hasOwnProperty("data", { title: "Basic" })).toBeTruthy();
+    expect(actual.hasOwnProperty("data")).toBeTruthy();
     expect(actual.content).toBe("this is content.");
   });
 

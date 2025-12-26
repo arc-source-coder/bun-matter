@@ -1,6 +1,5 @@
-import { isDeleteExpression } from "typescript";
 import parse from "./parse";
-import stringify from "./stringify";
+import serialize from "./serialize";
 
 export type Language = "yaml" | "toml" | "json";
 export type MatterInput = string | { content: string };
@@ -149,19 +148,19 @@ function getDefaultLanguage(opener: string): Language {
 }
 
 matter.stringify = (
+  content: string,
   data: Record<string, any>,
-  content?: string,
   options?: MatterOptions,
 ): string => {
   const [opener, closer] = normalizeDelimiters("", options?.delimiters);
   const { language } = determineLanguage("", opener, options?.language);
-  const matter = stringify(data, language);
+  const matter = serialize(data, language);
   if (matter === "") {
-    return ensureNewline(content ? content : "");
+    return ensureNewline(content ?? "");
   }
   return ensureNewline([opener, matter, closer, content].join("\n"));
 };
 
 function ensureNewline(str: string): string {
-  return str.endsWith("\n") ? str : str + "\n";
+  return str.endsWith("\n") ? str : str !== "" ? str + "\n" : str;
 }

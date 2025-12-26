@@ -1,7 +1,6 @@
-import type { Language } from ".";
-import parse from "./parse";
+import type { Language } from "./index";
 
-export default function stringify(matter: Record<string, any>, language: Language): string {
+export default function serialize(dataObject: Record<string, any>, language: Language): string {
   switch (language) {
     case "toml":
       throw new Error(
@@ -9,21 +8,21 @@ export default function stringify(matter: Record<string, any>, language: Languag
       );
     case "json":
       try {
-        const data = JSON.stringify(matter);
-        if (typeof data !== "string" || data === "{}" || data == "") {
+        const matter = JSON.stringify(dataObject, null, 2);
+        if (matter === "{}" || matter == "") {
           return "";
         }
-        return data;
+        return matter;
       } catch (e) {
         throw new Error(`JSON.stringify failed due to ${e}`);
       }
     default:
       try {
-        const parsed = Bun.YAML.stringify(matter, null, 2);
-        if (typeof parsed !== "string" || parsed === "{}" || parsed == "") {
+        const string = Bun.YAML.stringify(dataObject, null, 2);
+        if (string === "{}" || string == "" || string == undefined) {
           return "";
         }
-        return parsed;
+        return string;
       } catch (e) {
         throw new Error(`YAML.stringify failed due to ${e}`);
       }
