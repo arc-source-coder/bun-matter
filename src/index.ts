@@ -5,8 +5,8 @@ export type Language = "yaml" | "toml" | "json";
 export type MatterInput = string | { content: string };
 
 export interface ParsedMatter {
-  data: Record<string, any>;
   content: string;
+  data: Record<string, any>;
   matter: string;
   isEmpty: boolean;
   language?: Language;
@@ -24,16 +24,29 @@ export interface MatterOptions {
   delimiters?: string | [string, string];
 }
 
-export default function matter(input: MatterInput, options?: MatterOptions): ParsedMatter {
+function matterImpl(input: MatterInput, options?: MatterOptions): ParsedMatter {
   // handle empty input
   if (input === "") {
     return { data: {}, content: input, matter: "", isEmpty: true, language: undefined };
   }
   // normalize input
   const inputStr = typeof input === "string" ? input : input.content;
-
-  return parseMatter(inputStr, options);
+  let cached = matter.cache[inputStr];
+  if (!options) {
+    if (cached) {
+      return Object.assign({}, cached);
+    }
+  }
+  const parsed = parseMatter(inputStr, options);
+  matter.cache[inputStr] = parsed;
+  return parsed;
 }
+
+const matter = matterImpl as MatterFunction;
+matter.cache = {};
+matter.clearCache = () => (matter.cache = {});
+
+export default matter;
 
 function parseMatter(input: string, options?: MatterOptions): ParsedMatter {
   const [opener, closer] = normalizeDelimiters(input, options?.delimiters);
@@ -41,14 +54,14 @@ function parseMatter(input: string, options?: MatterOptions): ParsedMatter {
 
   // check if input starts with opening delimiter
   if (!input.startsWith(opener)) {
-    return { data: {}, content: input, matter: "", isEmpty: true, language: undefined };
+    return { content: input, data: {}, matter: "", isEmpty: true, language: undefined };
   }
 
   const openerLength = opener.length;
   // if the next character after the opening delimiter is
   // a character from the delimiter, then it's not a front-matter delimiter
   if (input.charAt(openerLength) === opener.slice(-1)) {
-    return { data: {}, content: input, matter: "", isEmpty: true, language: undefined };
+    return { content: input, data: {}, matter: "", isEmpty: true, language: undefined };
   }
 
   // strip the opening delimiter
@@ -87,11 +100,11 @@ function parseMatter(input: string, options?: MatterOptions): ParsedMatter {
 
   // return early if frontmatter is empty
   if (matterBlock === "") {
-    return { data: {}, content, matter: rawMatter, isEmpty: true, language };
+    return { content, data: {}, matter: rawMatter, isEmpty: true, language };
   }
 
   const data = parse(language, rawMatter) as Record<string, any>;
-  return { data, content, matter: rawMatter, isEmpty: false, language };
+  return { content, data, matter: rawMatter, isEmpty: false, language };
 }
 
 function normalizeDelimiters(
