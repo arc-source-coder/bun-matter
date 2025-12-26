@@ -6,11 +6,14 @@
   "scripts": {
     "dev": "bun run src/index.ts",
     "format": "bun --bun oxfmt",
+    "bench": "bun run benchmark/bench.ts",
     "typecheck": "bun --bun tsgo && bun --bun oxlint"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@typescript/native-preview": "^7.0.0-dev.20251226.1",
+    "gray-matter": "^4.0.3",
+    "mitata": "^1.0.34",
     "oxfmt": "^0.20.0",
     "oxlint": "^1.35.0"
   },

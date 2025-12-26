@@ -14,7 +14,9 @@ export default function serialize(dataObject: Record<string, any>, language: Lan
         }
         return matter;
       } catch (e) {
-        throw new Error(`JSON.stringify failed due to ${e}`);
+        throw new Error(
+          `JSON.stringify failed due to ${e instanceof Error ? e.message : String(e)}`,
+        );
       }
     default:
       try {
@@ -24,7 +26,9 @@ export default function serialize(dataObject: Record<string, any>, language: Lan
         }
         return string;
       } catch (e) {
-        throw new Error(`YAML.stringify failed due to ${e}`);
+        throw new Error(
+          `YAML.stringify failed due to ${e instanceof Error ? e.message : String(e)}`,
+        );
       }
   }
 }

@@ -5,11 +5,18 @@ export type Language = "yaml" | "toml" | "json";
 export type MatterInput = string | { content: string };
 
 export interface ParsedMatter {
-  data: any;
+  data: Record<string, any>;
   content: string;
   matter: string;
   isEmpty: boolean;
   language?: Language;
+}
+
+interface MatterFunction {
+  (input: MatterInput, options?: MatterOptions): ParsedMatter;
+  cache: Record<string, ParsedMatter>;
+  clearCache: () => void;
+  stringify: (content: string, data: Record<string, any>, options?: MatterOptions) => string;
 }
 
 export interface MatterOptions {
@@ -37,6 +44,7 @@ function parseMatter(input: string, options?: MatterOptions): ParsedMatter {
     return { data: {}, content: input, matter: "", isEmpty: true, language: undefined };
   }
 
+  const openerLength = opener.length;
   // if the next character after the opening delimiter is
   // a character from the delimiter, then it's not a front-matter delimiter
   if (input.charAt(openerLength) === opener.slice(-1)) {
@@ -82,7 +90,7 @@ function parseMatter(input: string, options?: MatterOptions): ParsedMatter {
     return { data: {}, content, matter: rawMatter, isEmpty: true, language };
   }
 
-  const data = parse(language, rawMatter);
+  const data = parse(language, rawMatter) as Record<string, any>;
   return { data, content, matter: rawMatter, isEmpty: false, language };
 }
 
