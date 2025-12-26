@@ -1,10 +1,5 @@
 import type { Language } from "./index";
 
-export interface Engine {
-  parse: Function;
-  stringify: Function;
-}
-
 export default function parse(language: Language, matter: string): unknown {
   switch (language) {
     case "toml":

@@ -1,3 +1,4 @@
+import { isDeleteExpression } from "typescript";
 import parse from "./parse";
 import stringify from "./stringify";
 
@@ -147,7 +148,20 @@ function getDefaultLanguage(opener: string): Language {
   return defaultDelimiters[opener] ?? "yaml";
 }
 
-matter.stringify = (object: unknown): string => {
-  // This is a stub
-  return stringify(object);
+matter.stringify = (
+  data: Record<string, any>,
+  content?: string,
+  options?: MatterOptions,
+): string => {
+  const [opener, closer] = normalizeDelimiters("", options?.delimiters);
+  const { language } = determineLanguage("", opener, options?.language);
+  const matter = stringify(data, language);
+  if (matter === "") {
+    return ensureNewline(content ? content : "");
+  }
+  return ensureNewline([opener, matter, closer, content].join("\n"));
 };
+
+function ensureNewline(str: string): string {
+  return str.endsWith("\n") ? str : str + "\n";
+}
