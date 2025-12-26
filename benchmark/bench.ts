@@ -31,12 +31,14 @@ summary(() => {
   group(`Parse ${fileContents.length} files (cache disabled)`, () => {
     bench("bun-matter", () => {
       for (const content of fileContents) {
+        matter.clearCache();
         matter(content);
       }
     });
 
     bench("gray-matter", () => {
       for (const content of fileContents) {
+        grayMatter.clearCache();
         grayMatter(content);
       }
     });
