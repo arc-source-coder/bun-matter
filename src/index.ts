@@ -24,6 +24,19 @@ export interface MatterOptions {
   delimiters?: string | [string, string];
 }
 
+const languageMap: Record<string, Language> = {
+  yaml: "yaml",
+  yml: "yaml",
+  toml: "toml",
+  json: "json",
+};
+
+const defaultDelimiters: Record<string, Language> = {
+  "---": "yaml",
+  "+++": "toml",
+  ";;;": "json",
+};
+
 function matterImpl(input: MatterInput, options?: MatterOptions): ParsedMatter {
   // handle empty input
   if (input === "") {
@@ -49,8 +62,26 @@ matter.clearCache = () => (matter.cache = {});
 export default matter;
 
 function parseMatter(input: string, options?: MatterOptions): ParsedMatter {
-  const [opener, closer] = normalizeDelimiters(input, options?.delimiters);
-  const openerLength = opener.length;
+  let opener = "---";
+  let closer = "---";
+
+  if (options?.delimiters) {
+    if (typeof options.delimiters === "string") {
+      opener = options.delimiters;
+      closer = options.delimiters;
+    } else {
+      opener = options.delimiters[0];
+      closer = options.delimiters[1];
+    }
+  } else {
+    if (input.startsWith("+++")) {
+      opener = "+++";
+      closer = "+++";
+    } else if (input.startsWith(";;;")) {
+      opener = ";;;";
+      closer = ";;;";
+    }
+  }
 
   // check if input starts with opening delimiter
   if (!input.startsWith(opener)) {
@@ -70,7 +101,16 @@ function parseMatter(input: string, options?: MatterOptions): ParsedMatter {
 
   // find the closing delimiter
   const closingPattern = "\n" + closer; // TODO: test '\n---' inside frontmatter edge case
-  let closerIndex = remaining.indexOf(closingPattern);
+
+  // search for frontmatter closer in the first 1KB
+  const searchLimit = Math.min(remaining.length, 1024);
+  const initialRegion = remaining.slice(0, searchLimit);
+  let closerIndex = initialRegion.indexOf(closingPattern);
+
+  // If not found in first 1KB, search the entire string
+  if (closerIndex === -1 && remaining.length > searchLimit) {
+    closerIndex = remaining.indexOf(closingPattern, searchLimit);
+  }
 
   // if no closer found, everything is frontmatter
   if (closerIndex === -1) {
@@ -87,7 +127,6 @@ function parseMatter(input: string, options?: MatterOptions): ParsedMatter {
 
   // extract the frontmatter block
   const rawMatter = remaining.slice(0, closerIndex);
-  const matterBlock = rawMatter.replace(/^\s*#[^\n]+/gm, "").trim();
 
   // extract content after closer
   let content = "";
@@ -99,7 +138,7 @@ function parseMatter(input: string, options?: MatterOptions): ParsedMatter {
   }
 
   // return early if frontmatter is empty
-  if (matterBlock === "") {
+  if (rawMatter.trim() === "") {
     return { content, data: {}, matter: rawMatter, isEmpty: true, language };
   }
 
@@ -107,65 +146,44 @@ function parseMatter(input: string, options?: MatterOptions): ParsedMatter {
   return { content, data, matter: rawMatter, isEmpty: false, language };
 }
 
-function normalizeDelimiters(
-  input: string,
-  delimiters?: string | [string, string],
-): [string, string] {
-  if (delimiters === undefined) {
-    if (input.startsWith("+++")) return ["+++", "+++"];
-    if (input.startsWith(";;;")) return [";;;", ";;;"];
-    return ["---", "---"];
-  }
-  if (typeof delimiters == "string") return [delimiters, delimiters];
-  return delimiters;
-}
-
 function determineLanguage(
   input: string,
   opener: string,
   explicitLanguage?: Language,
 ): { language: Language; remaining: string } {
-  const languageHint = input.match(/^([^\r\n]*)/)?.[0] ?? "";
+  let newlineIndex = input.indexOf("\n");
+  if (newlineIndex === -1) newlineIndex = input.length;
+
+  // Handle \r\n
+  const lineEndIndex = input[newlineIndex - 1] === "\r" ? newlineIndex - 1 : newlineIndex;
+
+  const languageHint = input.slice(0, lineEndIndex);
+  const remainingInput = input.slice(newlineIndex + 1); // Skip the newline
+  // const languageHint = input.match(/^([^\r\n]*)/)?.[0] ?? "";
 
   // Priority 1: Explicit language option
   if (explicitLanguage) {
     // strip language hints from the input (e.g., "---yaml\n...")
     return {
       language: explicitLanguage,
-      remaining: input.slice(languageHint.length),
+      remaining: remainingInput,
     };
   }
 
   // Priority 2: Language hint in content
   const language = languageHint.trim().toLowerCase();
-  const languageMap: Record<string, Language> = {
-    yaml: "yaml",
-    yml: "yaml",
-    toml: "toml",
-    json: "json",
-  };
   const mappedLanguage = languageMap[language];
   if (mappedLanguage !== undefined) {
-    return { language: mappedLanguage, remaining: input.slice(languageHint.length) };
+    return { language: mappedLanguage, remaining: remainingInput };
   }
 
   // Priority 3: Default based on opening delimiter
-  const detectedLanguage = getDefaultLanguage(opener);
+  const detectedLanguage = defaultDelimiters[opener] ?? "yaml";
   const shouldStripHint = languageHint.length > 0;
   return {
     language: detectedLanguage,
-    remaining: shouldStripHint ? input.slice(languageHint.length) : input,
+    remaining: shouldStripHint ? remainingInput : input,
   };
-}
-
-function getDefaultLanguage(opener: string): Language {
-  const defaultDelimiters: Record<string, Language> = {
-    "---": "yaml",
-    "+++": "toml",
-    ";;;": "json",
-  };
-
-  return defaultDelimiters[opener] ?? "yaml";
 }
 
 matter.stringify = (
@@ -173,7 +191,18 @@ matter.stringify = (
   data: Record<string, any>,
   options?: MatterOptions,
 ): string => {
-  const [opener, closer] = normalizeDelimiters("", options?.delimiters);
+  let opener = "---";
+  let closer = "---";
+
+  if (options?.delimiters) {
+    if (typeof options.delimiters === "string") {
+      opener = options.delimiters;
+      closer = options.delimiters;
+    } else {
+      opener = options.delimiters[0];
+      closer = options.delimiters[1];
+    }
+  }
   const { language } = determineLanguage("", opener, options?.language);
   const matter = serialize(data, language);
   if (matter === "") {
